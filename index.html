@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="MTVCrafter is a method for animating human images using 4D motion tokenization. It supports general and natural image animation from sparse inputs.">
+  <meta name="keywords" content="MTVCrafter, 4D Motion, Human Animation, Image Animation, Tokenization">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MTVCrafter: 4D Motion Tokenization for Open-World Human Image Animation</title>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYVRSFMDRL"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+
+    gtag('config', 'G-PYVRSFMDRL');
+  </script>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/favicon.svg">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+</head>
+<body>
+
+
+<section class="hero is-medium" style="background: linear-gradient(100deg, #7daaf3, #6c6fed); padding: 0.5rem 0.5rem;">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 has-text-white" style="letter-spacing: 1px;">
+            MTVCrafter: 4D Motion Tokenization for Open-World Human Image Animation
+          </h1>
+          <h2 class="subtitle is-4 has-text-white" style="margin-top: 1rem;">
+            A new paradigm for animating human images with expressive 4D motion tokens
+          </h2>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="columns is-centered mt-5">
+  <div class="column is-narrow has-text-centered">
+    <span class="link-block" style="margin: 0 8px;">
+      <a href="https://dingyanb.github.io/MTVCtafter/"
+         class="button is-normal is-rounded"
+         style="background-color: #cee3f9; color: #2563eb;">
+        <span class="icon">
+          <i class="fas fa-link"></i>
+        </span>
+        <span>Project</span>
+      </a>
+    </span>
+
+    <span class="link-block" style="margin: 0 8px;">
+      <a href="https://arxiv.org/abs/2505.10238"
+         class="button is-normal is-rounded"
+         style="background-color: #cee3f9; color: #2563eb;">
+        <span class="icon">
+          <i class="ai ai-arxiv"></i>
+        </span>
+        <span>Paper</span>
+      </a>
+    </span>
+
+    <span class="link-block" style="margin: 0 8px;">
+      <a href="https://github.com/DINGYANB/MTVCrafter"
+         class="button is-normal is-rounded"
+         style="background-color: #cee3f9; color: #2563eb;">
+        <span class="icon">
+          <i class="fab fa-github"></i>
+        </span>
+        <span>Code</span>
+      </a>
+    </span>
+
+    <span class="link-block" style="margin: 0 8px;">
+      <a href="https://huggingface.co/yanboding/MTVCrafter"
+        class="button is-normal is-rounded"
+        style="background-color: #cee3f9; color: #2563eb;">
+        <span class="icon" style="width: 1.2em; height: 1.2em; display: inline-block; vertical-align: middle;">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 128 128"
+            fill="#2563eb"
+            width="100%"
+            height="100%">
+            <path d="M104 32c-7-8-16-14-24-14-13 0-22 10-26 17-4-7-13-17-26-17-8 0-17 6-24 14-4 5-7 12-7 19v30c0 10 8 18 18 18h73c10 0 18-8 18-18v-30c0-7-3-14-7-19zM45 75c-9 0-16-6-16-14 0-7 7-13 15-13 7 0 14 6 14 13 0 8-6 14-13 14zm39 0c-8 0-15-6-15-14 0-7 7-13 15-13 8 0 15 6 15 13 0 8-7 14-15 14z"/>
+          </svg>
+        </span>
+        <span>Model</span>
+      </a>
+    </span>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <!-- Abstract. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3" style="margin-bottom: 1.5rem;">Abstract</h2>
+        <div class="box" style="background-color: #f9fafb; border-radius: 8px; padding: 2rem; text-align: justify; color: #444; font-size: 1.15rem; line-height: 1.7;">
+          <p style="text-indent: 2em;">
+            Human image animation has gained increasing attention and developed rapidly due to its broad applications in digital humans. However, existing methods entirely rely on 2D-rendered pose images for motion guidance, which limits generalization and discards essential 3D information for open-world animation. To tackle this problem, we propose MTVCrafter (Motion Tokenization Video Crafter), the first framework that directly models raw 3D motion sequences for human image animation. Specifically, we introduce 4DMoT (4D motion tokenizer) to quantize 3D motion sequences into 4D motion tokens. Compared to 2D-rendered pose images, 4D motion tokens offer more faithful spatio-temporal cues and avoid strict pixel-level alignment between pose image and character, enabling more flexible and disentangled control. Then, we introduce MV-DiT (Motion-aware Video DiT). By designing unique motion attention with 4D positional encodings, MV-DiT can effectively leverage motion tokens as 4D compact yet expressive context for human image animation in the complex 3D world. Hence, it marks a significant step forward in this field and opens a new direction for pose-guided human video generation. Experiments show that our MTVCrafter achieves state-of-the-art results with an FID-VID of 6.98, surpassing the second-best by 65%. Powered by robust motion tokens, MTVCrafter also generalizes well to diverse open-world characters (single/multiple, full/half-body) across various styles and scenarios.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Paper Motivation. -->
+    <div class="columns is-centered mt-5">
+      <div class="column is-four-fifths has-text-centered">
+        <h2 class="title is-3" style="margin-bottom: 1.5rem;">Motivation</h2>
+        <div class="box" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); overflow: hidden; padding: 1.5rem;">
+          <img src="./static/images/Motivation.png" alt="Motivation Illustration" style="width: 100%; height: auto; border-radius: 8px;">
+          <p style="margin-top: 1.5rem; font-size: 1.1rem; line-height: 1.6; text-align: left;">
+            Our motivation is that directly tokenizing 4D motion captures more faithful and expressive information than traditional 2D-rendered pose images derived from the driven video.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Paper Method. -->
+    <div class="columns is-centered mt-5">
+      <div class="column is-four-fifths has-text-centered">
+        <h2 class="title is-3" style="margin-bottom: 1.5rem;">Method</h2>
+        <div class="box" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); padding: 2rem; overflow: hidden; text-align: left; font-size: 1.1rem; line-height: 1.7; color: #333;">
+          
+          <p style="margin-bottom: 2rem;">
+            Our MTVCrafter comprises a <strong>4D motion tokenizer (4DMoT)</strong> and a <strong>motion-aware video diffusion transformer (MV-DiT)</strong>.
+            The 4DMoT encodes raw 4D motion into compact and expressive motion tokens,
+            while the MV-DiT integrates these tokens into a powerful video DiT backbone via 4D motion attention and 4D positional encodings.
+          </p>
+
+          <!-- First block -->
+          <div style="margin-bottom: 3rem;">
+            <img src="./static/images/4DMoT.png" alt="Method 1" style="width: 100%; border-radius: 8px;">
+            <p style="margin-top: 1rem;">
+              <strong style="color: #2563eb;">(1)</strong>
+              Our 4D motion tokenizer consists of an encoder-decoder framework to learn spatio-temporal latent representations of SMPL motion sequences,
+              and a vector quantizer to learn discrete tokens in a unified space.
+              All operations are performed in 2D space along frame and joint axes.
+            </p>
+          </div>
+
+          <!-- Second block -->
+          <div>
+            <img src="./static/images/MV-DiT.png" alt="Method 2" style="width: 100%; border-radius: 8px;">
+            <p style="margin-top: 1rem;">
+              <strong style="color: #2563eb;">(2)</strong>
+              Based on video DiT architecture,
+              we design a 4D motion attention module to combine motion tokens with vision tokens.
+              Since the patchify disrupted positional information,
+              we introduce 4D RoPE to recover the spatio-temporal relationships.
+              To further improve the quality of generation and generalization,
+              we use learnable unconditional tokens for motion classifier-free guidance.
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Part 1 Animation -->
+    <div class="columns is-centered mt-5">
+      <div class="column is-four-fifths has-text-centered">
+        <h2 class="title is-3">Open-World Characters Animation</h2>
+        <div class="box" style="position: relative; overflow: hidden; padding-bottom: 3rem;">
+          <video id="video-group1" class="video is-fullwidth" autoplay loop muted playsinline style="transition: opacity 0.3s ease;">
+            <source src="./static/videos/minecraft.mp4" type="video/mp4">
+          </video>
+          <p id="desc-group1" style="margin-top: 1.25rem; font-size: 1.05rem; color: #444; min-height: 1.5em;">
+            The Minecraft character dancing in a pixel-style world.
+          </p>
+          <div style="margin-top: 1rem;">
+            <button id="prev-group1" class="button is-light is-rounded mr-2">Prev</button>
+            <button id="next-group1" class="button is-light is-rounded ml-2">Next</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Part 2 Animation -->
+    <div class="columns is-centered mt-5">
+      <div class="column is-four-fifths has-text-centered">
+        <h2 class="title is-3">Animals Animation</h2>
+        <div class="box" style="position: relative; overflow: hidden; padding-bottom: 3rem;">
+          <video id="video-group2" class="video is-fullwidth" autoplay loop muted playsinline style="transition: opacity 0.3s ease;">
+            <source src="./static/videos/crab.mp4" type="video/mp4">
+          </video>
+          <p id="desc-group2" style="margin-top: 1.25rem; font-size: 1.05rem; color: #444; min-height: 1.5em;">
+            A crab is performing natural and smooth motion.
+          </p>
+          <div style="margin-top: 1rem;">
+            <button id="prev-group2" class="button is-light is-rounded mr-2">Prev</button>
+            <button id="next-group2" class="button is-light is-rounded ml-2">Next</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Part 3 Animation -->
+    <div class="columns is-centered mt-5">
+      <div class="column is-four-fifths has-text-centered">
+        <h2 class="title is-3">Multiple-Characters Animation</h2>
+        <div class="box" style="position: relative; overflow: hidden; padding-bottom: 3rem;">
+          <video id="video-group3" class="video is-fullwidth" autoplay loop muted playsinline style="transition: opacity 0.3s ease;">
+            <source src="./static/videos/spongeBob_and_patrick.mp4" type="video/mp4">
+          </video>
+          <p id="desc-group3" style="margin-top: 1.25rem; font-size: 1.05rem; color: #444; min-height: 1.5em;">
+            The cartoon-style characters SpongeBob and Patrick dancing side by side.
+          </p>
+          <div style="margin-top: 1rem;">
+            <button id="prev-group3" class="button is-light is-rounded mr-2">Prev</button>
+            <button id="next-group3" class="button is-light is-rounded ml-2">Next</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Part 4 Animation -->
+    <div class="columns is-centered mt-5">
+      <div class="column is-four-fifths has-text-centered">
+        <h2 class="title is-3">Object-Level Animation</h2>
+        <div class="box" style="position: relative; overflow: hidden; padding-bottom: 3rem;">
+          <video id="video-group4" class="video is-fullwidth" autoplay loop muted playsinline style="transition: opacity 0.3s ease;">
+            <source src="./static/videos/chair.mp4" type="video/mp4">
+          </video>
+          <p id="desc-group4" style="margin-top: 1.25rem; font-size: 1.05rem; color: #444; min-height: 1.5em;">
+            Animate this chair with smooth and natural motion.
+          </p>
+          <div style="margin-top: 1rem;">
+            <button id="prev-group4" class="button is-light is-rounded mr-2">Prev</button>
+            <button id="next-group4" class="button is-light is-rounded ml-2">Next</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Group 1: Open-World Characters
+      const group1 = {
+        videos: [
+          { src: "./static/videos/minecraft.mp4", desc: "The Minecraft character dancing in a pixel-style world." },
+          { src: "./static/videos/labubu.mp4", desc: "The Pop Mart character Labubu exhibits smooth and natural motion." },
+          { src: "./static/videos/nezha.mp4", desc: "The cartoon character is dancing energetically with vivid expressions." },
+          { src: "./static/videos/shinupi.mp4", desc: "The character Snoopy is performing a lively movement with cute style." },
+          { src: "./static/videos/woman.mp4", desc: "A woman doing yoga starts to dance." },
+          { src: "./static/videos/goku.mp4", desc: "Japanese comic character Super Saiyan Son Goku powering up with strong pose." },
+          { src: "./static/videos/mori.mp4", desc: "The stylized woman walked slowly, then raised her hand." }
+        ],
+        index: 0,
+        videoEl: document.getElementById("video-group1"),
+        descEl: document.getElementById("desc-group1")
+      };
+
+      // Group 2: Animals
+      const group2 = {
+        videos: [
+          { src: "./static/videos/crab.mp4", desc: "A crab is performing natural and smooth motion." },
+          { src: "./static/videos/tiger.mp4", desc: "A tiger is dancing with smooth and natural motion." },
+          { src: "./static/videos/shiba.mp4", desc: "A cute Shiba Inu is dancing." },
+          { src: "./static/videos/cat.mp4", desc: "A cat is dancing." },
+          { src: "./static/videos/bird.mp4", desc: "Animate this bird with smooth and natural motion." }
+        ],
+        index: 0,
+        videoEl: document.getElementById("video-group2"),
+        descEl: document.getElementById("desc-group2")
+      };
+
+      const group3 = {
+        videos: [
+          { src: "./static/videos/spongeBob_and_patrick.mp4", desc: "The cartoon-style characters SpongeBob and Patrick dancing side by side." },
+          { src: "./static/videos/animals.mp4", desc: "A group of animals running together with synced motion." },
+          { src: "./static/videos/multi-person.mp4", desc: "Multiple people exercising together in an urban scene." },
+          { src: "./static/videos/two-girls.mp4", desc: "Two girls dancing together with coherent gestures." }
+        ],
+        index: 0,
+        videoEl: document.getElementById("video-group3"),
+        descEl: document.getElementById("desc-group3")
+      };
+
+      const group4 = {
+        videos: [
+          { src: "./static/videos/chair.mp4", desc: "Animate this chair with smooth and natural motion." },
+          { src: "./static/videos/car.mp4", desc: "Animate this car with smooth and natural motion." },
+          { src: "./static/videos/hydrant.mp4", desc: "Animate this hydrant with smooth and natural motion." }
+        ],
+        index: 0,
+        videoEl: document.getElementById("video-group4"),
+        descEl: document.getElementById("desc-group4")
+      };
+
+
+      function fadeToNewVideo(group) {
+        group.videoEl.style.opacity = 0;
+        group.descEl.style.opacity = 0;
+        setTimeout(() => {
+          const data = group.videos[group.index];
+          group.videoEl.querySelector("source").src = data.src;
+          group.videoEl.load();
+          group.videoEl.play();
+          group.descEl.textContent = data.desc;
+          group.videoEl.style.opacity = 1;
+          group.descEl.style.opacity = 1;
+        }, 300);
+      }
+
+      // Group 1 events
+      document.getElementById("prev-group1").addEventListener("click", () => {
+        group1.index = (group1.index - 1 + group1.videos.length) % group1.videos.length;
+        fadeToNewVideo(group1);
+      });
+      document.getElementById("next-group1").addEventListener("click", () => {
+        group1.index = (group1.index + 1) % group1.videos.length;
+        fadeToNewVideo(group1);
+      });
+
+      // Group 2 events
+      document.getElementById("prev-group2").addEventListener("click", () => {
+        group2.index = (group2.index - 1 + group2.videos.length) % group2.videos.length;
+        fadeToNewVideo(group2);
+      });
+      document.getElementById("next-group2").addEventListener("click", () => {
+        group2.index = (group2.index + 1) % group2.videos.length;
+        fadeToNewVideo(group2);
+      });
+
+      // Group 3
+      document.getElementById("prev-group3").addEventListener("click", () => {
+        group3.index = (group3.index - 1 + group3.videos.length) % group3.videos.length;
+        fadeToNewVideo(group3);
+      });
+      document.getElementById("next-group3").addEventListener("click", () => {
+        group3.index = (group3.index + 1) % group3.videos.length;
+        fadeToNewVideo(group3);
+      });
+
+      // Group 4
+      document.getElementById("prev-group4").addEventListener("click", () => {
+        group4.index = (group4.index - 1 + group4.videos.length) % group4.videos.length;
+        fadeToNewVideo(group4);
+      });
+      document.getElementById("next-group4").addEventListener("click", () => {
+        group4.index = (group4.index + 1) % group4.videos.length;
+        fadeToNewVideo(group4);
+      });
+    </script>
+
+
+    <!-- Paper Animation. -->
+    <!-- <div class="columns is-centered mt-5">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Animation</h2>
+
+          <div class="box">
+            <video class="video is-fullwidth" autoplay loop muted playsinline>
+              <source src="./static/videos/minecraft.mp4" type="video/mp4">
+            </video>
+          </div>
+
+          <div class="box">
+            <video class="video is-fullwidth" autoplay loop muted playsinline>
+              <source src="./static/videos/labubu.mp4" type="video/mp4">
+            </video>
+          </div>
+          
+          <div class="box">
+            <video class="video is-fullwidth" autoplay loop muted playsinline>
+              <source src="./static/videos/nezha.mp4" type="video/mp4">
+            </video>
+          </div>
+
+          <div class="box">
+            <video class="video is-fullwidth" autoplay loop muted playsinline>
+              <source src="./static/videos/shinupi.mp4" type="video/mp4">
+            </video>
+          </div>
+          
+          <div class="box">
+            <video class="video is-fullwidth" autoplay loop muted playsinline>
+              <source src="./static/videos/woman.mp4" type="video/mp4">
+            </video>
+          </div>
+          
+          <div class="box">
+            <video class="video is-fullwidth" autoplay loop muted playsinline>
+              <source src="./static/videos/goku.mp4" type="video/mp4">
+            </video>
+          </div>
+
+          <div class="box">
+            <video class="video is-fullwidth" autoplay loop muted playsinline>
+              <source src="./static/videos/mori.mp4" type="video/mp4">
+            </video>
+          </div>
+        </div>   
+
+          #######
+          <div class="box">
+            <video class="video is-fullwidth" autoplay loop muted playsinline>
+              <source src="./static/videos/jibuli.mp4" type="video/mp4">
+            </video>
+          </div>
+
+          <div class="box">
+            <video class="video is-fullwidth" autoplay loop muted playsinline>
+              <source src="./static/videos/niuzai.mp4" type="video/mp4">
+            </video>
+          </div>
+
+          <div class="box">
+            <video class="video is-fullwidth" autoplay loop muted playsinline>
+              <source src="./static/videos/human.mp4" type="video/mp4">
+            </video>
+          </div>
+
+          <div class="box">
+            <video class="video is-fullwidth" autoplay loop muted playsinline>
+              <source src="./static/videos/dijia.mp4" type="video/mp4">
+            </video>
+          </div>
+
+          <div class="box">
+            <video class="video is-fullwidth" autoplay loop muted playsinline>
+              <source src="./static/videos/iron-man.mp4" type="video/mp4">
+            </video>
+          </div>
+      
+        </div>
+      </div>
+    </div> -->
+
+  </div>
+</section>
+
+
+</body>
+</html>
